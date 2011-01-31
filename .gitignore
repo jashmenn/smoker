@@ -1,0 +1,11 @@
+/build
+/checkouts
+/lib
+/work
+/pom.xml
+/*.jar
+
+.DS_Store
+*~
+.\#*
+\#*#
