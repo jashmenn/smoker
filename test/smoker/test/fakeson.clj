@@ -9,12 +9,11 @@
 (deftest test-that-you-can-parse-fakeson 
   (is (= 26 (reduce 
          (fn [sum line]
-           (+ sum (count (seq (FakesonParser/urlStringsFromWhateverThisCrapIs line))))
-           ) 0 (su/split-lines (slurp test-file))))))
+           (+ sum (count (seq (FakesonParser/urlStringsFromWhateverThisCrapIs line)))))
+         0 (su/split-lines (slurp test-file))))))
 
 (comment
 
   (test-that-you-can-parse-fakeson)
 
-  ()
   )

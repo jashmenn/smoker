@@ -6,4 +6,25 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
 
 ## Usage
 
-FIXME: write
+       # wherever you have your code
+       lein uberjar
+
+       # on your server
+       mkdir ~/hive-jars
+       mv smoker-1.0.0-SNAPSHOT-standalone.jar ~/hive-jars/
+       cd hive-jars
+
+       # start hive with auxpath
+       hive --auxpath ~/hive-jars
+       add jar /home/nmurray/hive-jars/smoker-1.0.0-SNAPSHOT-standalone.jar;
+       list jars;
+       create temporary function my_lower as 'smoker.udf.MyLowerCase';
+       select my_lower(listing_name) from listing_extract_vw where ds=20110101 limit 10;
+
+## References
+
+* http://dev.bizo.com/2009/06/custom-udfs-and-hive.html
+* http://dev.bizo.com/2010/07/extending-hive-with-custom-udtfs.html
+* http://stackoverflow.com/questions/2181774/calling-clojure-from-java
+* http://kotka.de/blog/2010/03/proxy_gen-class_little_brother.html
+* http://clojure.org/compilation

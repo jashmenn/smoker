@@ -49,5 +49,7 @@
      }
   :compile-path "build/classes"
   :target-dir "build"
-  :java-source-path "src"
+  :java-source-path "src/java"
+  :source-path "src/clj"
+  :aot [smoker.udf.MyLowerCase]
   )
