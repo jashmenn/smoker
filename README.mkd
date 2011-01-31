@@ -1,6 +1,6 @@
 # smoker
 
-![SMOKER](/nmurray/smoker/raw/master/doc/smoker.jpg)
+![SMOKER](/nmurray/smoker/raw/master/doc/images/smoker.jpg)
 
 Custom Hive UDFs, specifically for dealing with ATTi data.
 
