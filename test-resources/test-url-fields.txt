@@ -1,0 +1,15 @@
+{"(http://www.acf.hhs.gov/programs/hsb,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.bvasd.net,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.lifeascentcoaching.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.ekeystone.com,,f,,LYP)","(http://www.keyparts.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.traciepurcey.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.rivercityrestaurantequip.com/,\\"Display URL\\",t,\\"Url Disco\\",LYP)"}
+{"(http://www.nwacareers.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.libertyadvertising.biz,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.acf.hhs.gov/programs/hsb,,t,\\"Url Disco\\",LYP)"}
+{"(http://cvs.com,\\"Display URL\\",f,,LYP)","(http://www.cvs.com,,f,,LYP)","(http://www.mypalmdale.com,,t,\\"Url Disco\\",LYP)","(http://www.cvsedi.com,,t,,LYP)","(http://www.myavonneighborhood.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.ft.newyorklife.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.iowaschildren.org,,t,\\"Url Disco\\",LYP)","(http://www.fns.usda.gov/wic,,f,,LYP)"}
+{"(http://www.fsa.usda.gov,,f,,LYP)","(http://www.fcskansas.com,,t,\\"DQ Clean-up - wrong url\\",LYP)","(http://www.al.usda.gov,,t,\\"Url Disco\\",LYP)","(http://www.vt.usda.gov,,t,\\"Url Disco\\",LYP)","(http://www.tn.usda.gov,,t,\\"Url Disco\\",LYP)","(http://www.ny.usda.gov,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.ameritribes.com,,t,\\"Url Disco\\",LYP)"}
+{"(http://www.benchmarkindustries.com,,t,\\"Url Disco\\",LYP)"}
