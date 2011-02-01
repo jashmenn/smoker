@@ -3,15 +3,7 @@
   :dependencies 
   [[org.clojure/clojure "1.2.0"]
    [org.clojure/clojure-contrib "1.2.0"]
-   
-   [commons-lang "2.5"]
-   [commons-logging "1.0.4"]
-   [commons-io "2.0"]
-   [log4j "1.2.15" :exclusions
-    [javax.mail/mail
-     javax.jms/jms
-     com.sun.jdmk/jmxtools
-     com.sun.jmx/jmxri]]]
+   [commons-logging "1.0.4"]]
   :dev-dependencies
   [[org.apache.hadoop/hadoop-core "0.20.2-dev" :exclusions
     [log4j
@@ -51,5 +43,5 @@
   :target-dir "build"
   :java-source-path "src/java"
   :source-path "src/clj"
-  :aot [smoker.udf.MyLowerCase]
+  :aot :all
   )

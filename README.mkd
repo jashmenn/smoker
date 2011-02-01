@@ -7,19 +7,26 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
 ## Usage
 
        # wherever you have your code
+       lein compile
        lein uberjar
+       scp build/smoker-1.0.0-SNAPSHOT-standalone.jar myserver:~/hive-jars
 
-       # on your server
-       mkdir ~/hive-jars
-       mv smoker-1.0.0-SNAPSHOT-standalone.jar ~/hive-jars/
-       cd hive-jars
+       # on your server, start hive with auxpath
+       hive --auxpath /home/nmurray/hive-jars
 
-       # start hive with auxpath
-       hive --auxpath ~/hive-jars
+       # tell hive about your jars
        add jar /home/nmurray/hive-jars/smoker-1.0.0-SNAPSHOT-standalone.jar;
        list jars;
+
+       # create your operations
        create temporary function my_lower as 'smoker.udf.MyLowerCase';
        select my_lower(listing_name) from listing_extract_vw where ds=20110101 limit 10;
+
+       # or
+       create temporary function tokenize as 'smoker.udf.MyTokenize';
+       select tokenize(listing_name) AS (word, count) from listing_extract_vw where ds=20110101 limit 10;
+
+
 
 ## References
 
@@ -29,3 +36,4 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
 * http://kotka.de/blog/2010/03/proxy_gen-class_little_brother.html
 * http://clojure.org/compilation
 * http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
+* http://groups.google.com/group/clojure/browse_thread/thread/1f48e0d4f42e95fd/b578a1834f307b06
