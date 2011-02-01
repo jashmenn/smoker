@@ -28,3 +28,4 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
 * http://stackoverflow.com/questions/2181774/calling-clojure-from-java
 * http://kotka.de/blog/2010/03/proxy_gen-class_little_brother.html
 * http://clojure.org/compilation
+* http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
