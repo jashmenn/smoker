@@ -38,14 +38,17 @@
     (ObjectInspectorFactory/getStandardStructObjectInspector 
        fieldNames fieldIOs)))
 
+(defn tokenize [line]
+  (map 
+   (fn [token] [token (Integer/valueOf 1)]) 
+   (su/split line #"\s+")))
+
 (defn -process [this record]
   (if-let [document (.getPrimitiveJavaObject 
-                      (@(.state this) :stringIO) (nth record 0))]
-    (doall 
-     (map 
-      (fn [token]
-        (.emit this (into-array Object [token (Integer/valueOf 1)]))) 
-      (su/split document #"\s+")))))
+                     (@(.state this) :stringIO) (nth record 0))]
+    (doall (map (fn [results] 
+                  (.emit this (into-array Object results))) 
+                (tokenize document)))))
 
 (defn -close [this])
 
