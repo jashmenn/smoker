@@ -22,10 +22,18 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
        create temporary function my_lower as 'smoker.udf.MyLowerCase';
        select my_lower(listing_name) from listing_extract_vw where ds=20110101 limit 10;
 
-       # or
+## List of Operations
+
+Lower-case. The "hello-world" of UDFs
+
+       create temporary function my_lower as 'smoker.udf.MyLowerCase';
+       select my_lower(listing_name) from listing_extract_vw where ds=20110101 limit 10;
+
+Tokenize. The "hello-cruel-world" of UDTFs. UDFs emit a single record,
+UDTFs can emit multiple records for a single input record.
+
        create temporary function tokenize as 'smoker.udf.MyTokenize';
        select tokenize(listing_name) AS (word, count) from listing_extract_vw where ds=20110101 limit 10;
-
 
 
 ## References
