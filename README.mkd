@@ -37,3 +37,4 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
 * http://clojure.org/compilation
 * http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
 * http://groups.google.com/group/clojure/browse_thread/thread/1f48e0d4f42e95fd/b578a1834f307b06
+* https://github.com/stuartsierra/clojure-hadoop
