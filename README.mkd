@@ -36,6 +36,13 @@ UDTFs can emit multiple records for a single input record.
        select tokenize(listing_name) AS (word, count) from listing_extract_vw where ds=20110101 limit 10;
 
 
+Parse MDM URLs
+
+       create temporary function parse_mdm_urls as 'smoker.udf.ParseMdmUrls';
+       set hive.optimize.ppd=false; // see http://wiki.apache.org/hadoop/Hive/LanguageManual/LateralView
+       SELECT id, url FROM mdm_listings LATERAL VIEW parse_mdm_urls(urls) urlTable AS url WHERE ds=20110109 LIMIT 10;
+
+
 ## References
 
 * http://dev.bizo.com/2009/06/custom-udfs-and-hive.html
