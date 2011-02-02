@@ -6,16 +6,25 @@ Custom Hive UDFs, specifically for dealing with ATTi data.
 
 ## Usage
 
+If you want to compile yourself you can:
+
        # wherever you have your code
        lein compile
        lein uberjar
-       scp build/smoker-1.0.0-SNAPSHOT-standalone.jar myserver:~/hive-jars
+       scp build/smoker-1.0.0-SNAPSHOT-standalone.jar myserver:~/hive-jars/smoker-standalone.jar
+
+If you just want to download and use the binary, grab it from nexus:
+
+       mkdir ~/hive-jars
+       curl -0 http://svn2.wc1.yellowpages.com:9999/nexus/content/repositories/releases/com/atti/wdm/smoker/1.0.1/smoker-1.0.1.jar > ~/hive-jars/smoker-standalone.jar
+
+Then use it within Hive:
 
        # on your server, start hive with auxpath
        hive --auxpath /home/nmurray/hive-jars
 
-       # tell hive about your jars
-       add jar /home/nmurray/hive-jars/smoker-1.0.0-SNAPSHOT-standalone.jar;
+       # tell hive about your jars (possibly optional)
+       add jar /home/nmurray/hive-jars/smoker-standalone.jar;
        list jars;
 
        # create your operations
@@ -35,13 +44,22 @@ UDTFs can emit multiple records for a single input record.
        create temporary function tokenize as 'smoker.udf.MyTokenize';
        select tokenize(listing_name) AS (word, count) from listing_extract_vw where ds=20110101 limit 10;
 
-
 Parse MDM URLs
 
        create temporary function parse_mdm_urls as 'smoker.udf.ParseMdmUrls';
+
+       # get just the urls
+       SELECT DISTINCT a.url FROM ( SELECT parse_mdm_urls(urls) AS (url) FROM mdm_listings WHERE ds=20110109 ) a;
+
+       # or "join" with the id (this takes a long time)
        set hive.optimize.ppd=false; // see http://wiki.apache.org/hadoop/Hive/LanguageManual/LateralView
        SELECT id, url FROM mdm_listings LATERAL VIEW parse_mdm_urls(urls) urlTable AS url WHERE ds=20110109 LIMIT 10;
+       set hive.optimize.ppd=true; // turn this back on or you'll be sorry when you try to use a WHERE clause
 
+## Authors
+
+* Nate Murray <nmurray@attinteractive.com>
+* Bruce Holmes
 
 ## References
 

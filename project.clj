@@ -1,4 +1,4 @@
-(defproject smoker "1.0.0-SNAPSHOT"
+(defproject com.atti.wdm/smoker "1.0.1"
   :description "When you visit your Hive, bring your smoker and you'll get stung less"
   :dependencies 
   [[org.clojure/clojure "1.2.0"]
