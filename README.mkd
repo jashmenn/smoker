@@ -45,11 +45,11 @@ Parse MDM URLs
 
 ## References
 
-* http://dev.bizo.com/2009/06/custom-udfs-and-hive.html
-* http://dev.bizo.com/2010/07/extending-hive-with-custom-udtfs.html
-* http://stackoverflow.com/questions/2181774/calling-clojure-from-java
-* http://kotka.de/blog/2010/03/proxy_gen-class_little_brother.html
-* http://clojure.org/compilation
-* http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
-* http://groups.google.com/group/clojure/browse_thread/thread/1f48e0d4f42e95fd/b578a1834f307b06
-* https://github.com/stuartsierra/clojure-hadoop
+* [http://dev.bizo.com/2009/06/custom-udfs-and-hive.html](http://dev.bizo.com/2009/06/custom-udfs-and-hive.html)
+* [http://dev.bizo.com/2010/07/extending-hive-with-custom-udtfs.html](http://dev.bizo.com/2010/07/extending-hive-with-custom-udtfs.html)
+* [http://stackoverflow.com/questions/2181774/calling-clojure-from-java](http://stackoverflow.com/questions/2181774/calling-clojure-from-java)
+* [http://kotka.de/blog/2010/03/proxy_gen-class_little_brother.html](http://kotka.de/blog/2010/03/proxy_gen-class_little_brother.html)
+* [http://clojure.org/compilation](http://clojure.org/compilation)
+* [http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html](http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html)
+* [http://groups.google.com/group/clojure/browse_thread/thread/1f48e0d4f42e95fd/b578a1834f307b06](http://groups.google.com/group/clojure/browse_thread/thread/1f48e0d4f42e95fd/b578a1834f307b06)
+* [https://github.com/stuartsierra/clojure-hadoop](https://github.com/stuartsierra/clojure-hadoop)
