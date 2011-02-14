@@ -8,7 +8,6 @@
   [[org.apache.hadoop/hadoop-core "0.20.2-dev" :exclusions
     [log4j
      commons-httpclient
-     commons-logging
      javax.servlet/servlet-api
      org.apache.ant/ant
      org.apache.ant/ant-launcher
@@ -27,6 +26,8 @@
    [hive/hive-service "0.5.0"]
    [hive/hive-shims "0.5.0"]
    [hive/hive-serde "0.5.0"]
+   [url-normalizer "0.0.4"]
+   [raven "1.0.1-SNAPSHOT"]
    [lein-run "1.0.0"]
    [lein-javac "1.2.1-SNAPSHOT"]
    [swank-clojure "1.3.0-SNAPSHOT"]
