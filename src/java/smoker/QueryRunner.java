@@ -50,17 +50,20 @@ public class QueryRunner {
   public QueryRunner() {
     Log LOG = LogFactory.getLog("QueryRunner");
     console = new LogHelper(LOG);
+
+    // NOTE: It is critical to do this here so that log4j is reinitialized before
+    // any of the other core hive classes are loaded
+    SessionState.initHiveLog4j();
+ 
+    ss = new CliSessionState(new HiveConf(SessionState.class));
+
     boot();
   }
 
 
   public void boot() {
-    // NOTE: It is critical to do this here so that log4j is reinitialized before
-    // any of the other core hive classes are loaded
-    SessionState.initHiveLog4j();
-    
-    ss = new CliSessionState (new HiveConf(SessionState.class));
-
+   
+    // todo allow overriding these
     ss.in = System.in;
     try {
       ss.out = new PrintStream(System.out, true, "UTF-8");
@@ -92,17 +95,7 @@ public class QueryRunner {
       }
     }
 
-    //conf.set("javax.jdo.option.ConnectionURL", "jdbc:mysql://localhost:3333/hive?createDatabaseIfNotExist=true");
-    HiveConf.setVar(conf, HiveConf.ConfVars.METASTOREURIS, "jdbc:mysql://localhost:3333/hive?createDatabaseIfNotExist=true");
-    conf.set("javax.jdo.option.ConnectionUserName", "hive");
-    conf.set("javax.jdo.option.ConnectionPassword", "hive");
-    conf.set("javax.jdo.option.ConnectionDriverName", "com.mysql.jdbc.Driver");
-
     SessionState.start(ss);
-
-    //QueryRunner cli = new QueryRunner();
-    //cli.processCmd("show tables");
-
   }
   
   public int runCmd(String cmd) {
@@ -164,7 +157,7 @@ public class QueryRunner {
 
   public static void main(String[] args) throws Exception {
     QueryRunner cli = new QueryRunner();
-    cli.runCmd("show tables");
+    cli.runCmd("describe web_data");
   }
 
 }
