@@ -43,83 +43,23 @@ import org.apache.hadoop.hive.shims.ShimLoader;
 
 public class QueryRunner {
 
-  public final static String prompt = "hive";
-  public final static String prompt2 = "    "; // when ';' is not yet seen
-
   private LogHelper console;
   private Configuration conf;
+  private CliSessionState ss;
 
   public QueryRunner() {
-    SessionState ss = SessionState.get();
-    conf = (ss != null) ? ss.getConf() : new Configuration ();
     Log LOG = LogFactory.getLog("QueryRunner");
     console = new LogHelper(LOG);
-  }
-  
-  public int processCmd(String cmd) {
-    SessionState ss = SessionState.get();
-    
-    String cmd_trimmed = cmd.trim();
-    String[] tokens = cmd_trimmed.split("\\s+");
-    String cmd_1 = cmd_trimmed.substring(tokens[0].length()).trim();
-    int ret = 0;
-
-    CommandProcessor proc = CommandProcessorFactory.get(tokens[0]);
-    if(proc != null) {
-        if(proc instanceof Driver) {
-            Driver qp = (Driver) proc;
-            PrintStream out = ss.out;
-            long start = System.currentTimeMillis();
-
-            ret = qp.run(cmd);
-            if (ret != 0) {
-                qp.close();
-                return ret;
-            }
-        
-            Vector<String> res = new Vector<String>();
-            try {
-                while (qp.getResults(res)) {
-                    for (String r:res) {
-                        out.println(r);
-                    }
-                    res.clear();
-                    if (out.checkError()) {
-                        break;
-                    }
-                }
-            } catch (IOException e) {
-                console.printError("Failed with exception " + e.getClass().getName() + ":" +   e.getMessage(),
-                                   "\n" + org.apache.hadoop.util.StringUtils.stringifyException(e));
-                ret = 1;
-            }
-            
-            int cret = qp.close();
-            if (ret == 0) {
-                ret = cret;
-            }
-
-            long end = System.currentTimeMillis();
-            if (end > start) {
-                double timeTaken = (double)(end-start)/1000.0;
-                console.printInfo("Time taken: " + timeTaken + " seconds", null);
-            }
-
-        } else {
-            ret = proc.run(cmd_1);
-        }
-    }
-
-    return ret;
+    boot();
   }
 
-  public static void main(String[] args) throws Exception {
 
+  public void boot() {
     // NOTE: It is critical to do this here so that log4j is reinitialized before
     // any of the other core hive classes are loaded
     SessionState.initHiveLog4j();
     
-    CliSessionState ss = new CliSessionState (new HiveConf(SessionState.class));
+    ss = new CliSessionState (new HiveConf(SessionState.class));
 
     ss.in = System.in;
     try {
@@ -136,15 +76,20 @@ public class QueryRunner {
     }
     
     if(!ShimLoader.getHadoopShims().usesJobShell()) {
-      // hadoop-20 and above - we need to augment classpath using hiveconf components
-      // see also: code in ExecDriver.java
-      ClassLoader loader = conf.getClassLoader();
-      String auxJars = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEAUXJARS);
-      if (StringUtils.isNotBlank(auxJars)) {
-        loader = Utilities.addToClassPath(loader, StringUtils.split(auxJars, ","));
+      try {
+        // hadoop-20 and above - we need to augment classpath using hiveconf components
+        // see also: code in ExecDriver.java
+        ClassLoader loader = conf.getClassLoader();
+        String auxJars = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEAUXJARS);
+        if (StringUtils.isNotBlank(auxJars)) {
+          loader = Utilities.addToClassPath(loader, StringUtils.split(auxJars, ","));
+        }
+        conf.setClassLoader(loader);
+        Thread.currentThread().setContextClassLoader(loader);
+      } catch (Exception e) {
+        console.printError("Loading aux jars failed with exception " + e.getClass().getName() + ":" +   e.getMessage(),
+                           "\n" + org.apache.hadoop.util.StringUtils.stringifyException(e));
       }
-      conf.setClassLoader(loader);
-      Thread.currentThread().setContextClassLoader(loader);
     }
 
     //conf.set("javax.jdo.option.ConnectionURL", "jdbc:mysql://localhost:3333/hive?createDatabaseIfNotExist=true");
@@ -155,9 +100,71 @@ public class QueryRunner {
 
     SessionState.start(ss);
 
-    QueryRunner cli = new QueryRunner();
-    cli.processCmd("show tables");
+    //QueryRunner cli = new QueryRunner();
+    //cli.processCmd("show tables");
 
+  }
+  
+  public int runCmd(String cmd) {
+    SessionState ss = SessionState.get();
+    
+    String cmd_trimmed = cmd.trim();
+    String[] tokens = cmd_trimmed.split("\\s+");
+    String cmd_1 = cmd_trimmed.substring(tokens[0].length()).trim();
+    int ret = 0;
+
+    CommandProcessor proc = CommandProcessorFactory.get(tokens[0]);
+    if(proc != null) {
+      if(proc instanceof Driver) {
+        Driver qp = (Driver) proc;
+        PrintStream out = ss.out;
+        long start = System.currentTimeMillis();
+
+        ret = qp.run(cmd);
+        if (ret != 0) {
+          qp.close();
+          return ret;
+        }
+        
+        Vector<String> res = new Vector<String>();
+        try {
+          while (qp.getResults(res)) {
+            for (String r:res) {
+              out.println(r);
+            }
+            res.clear();
+            if (out.checkError()) {
+              break;
+            }
+          }
+        } catch (IOException e) {
+          console.printError("Failed with exception " + e.getClass().getName() + ":" +   e.getMessage(),
+                             "\n" + org.apache.hadoop.util.StringUtils.stringifyException(e));
+          ret = 1;
+        }
+            
+        int cret = qp.close();
+        if (ret == 0) {
+          ret = cret;
+        }
+
+        long end = System.currentTimeMillis();
+        if (end > start) {
+          double timeTaken = (double)(end-start)/1000.0;
+          console.printInfo("Time taken: " + timeTaken + " seconds", null);
+        }
+
+      } else {
+        ret = proc.run(cmd_1);
+      }
+    }
+
+    return ret;
+  }
+
+  public static void main(String[] args) throws Exception {
+    QueryRunner cli = new QueryRunner();
+    cli.runCmd("show tables");
   }
 
 }
