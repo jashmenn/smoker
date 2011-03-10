@@ -63,143 +63,54 @@ public class QueryRunner {
     String[] tokens = cmd_trimmed.split("\\s+");
     String cmd_1 = cmd_trimmed.substring(tokens[0].length()).trim();
     int ret = 0;
-    
-    if (cmd_trimmed.toLowerCase().equals("quit") || cmd_trimmed.toLowerCase().equals("exit")) {
 
-      // if we have come this far - either the previous commands
-      // are all successful or this is command line. in either case
-      // this counts as a successful run
-      System.exit(0);
-
-    } else if (cmd_trimmed.startsWith("!")) {
-
-      String shell_cmd = cmd_trimmed.substring(1);
-
-      //shell_cmd = "/bin/bash -c \'" + shell_cmd + "\'";
-      try {
-        Process executor = Runtime.getRuntime().exec(shell_cmd);
-        StreamPrinter outPrinter = new StreamPrinter(executor.getInputStream(), null, ss.out);
-        StreamPrinter errPrinter = new StreamPrinter(executor.getErrorStream(), null, ss.err);
-        
-        outPrinter.start();
-        errPrinter.start();
-      
-        ret = executor.waitFor();
-        if (ret != 0) {
-          console.printError("Command failed with exit code = " + ret);
-        }
-      }
-      catch (Exception e) {
-        console.printError("Exception raised from Shell command " + e.getLocalizedMessage(),
-                           org.apache.hadoop.util.StringUtils.stringifyException(e));
-        ret = 1;
-      }
-
-    } else if (tokens[0].toLowerCase().equals("list")) {
-
-      SessionState.ResourceType t;
-      if(tokens.length < 2 || (t = SessionState.find_resource_type(tokens[1])) == null) {
-        console.printError("Usage: list [" +
-                           StringUtils.join(SessionState.ResourceType.values(),"|") +
-                           "] [<value> [<value>]*]" );
-        ret = 1;
-      } else {
-        List<String> filter = null;
-        if(tokens.length >=3) {
-          System.arraycopy(tokens, 2, tokens, 0, tokens.length-2);
-          filter = Arrays.asList(tokens);
-        }
-        Set<String> s = ss.list_resource(t, filter);
-        if(s != null && !s.isEmpty())
-          ss.out.println(StringUtils.join(s, "\n"));
-      }
-
-    } else {
-      CommandProcessor proc = CommandProcessorFactory.get(tokens[0]);
-      if(proc != null) {
+    CommandProcessor proc = CommandProcessorFactory.get(tokens[0]);
+    if(proc != null) {
         if(proc instanceof Driver) {
-          Driver qp = (Driver) proc;
-          PrintStream out = ss.out;
-          long start = System.currentTimeMillis();
+            Driver qp = (Driver) proc;
+            PrintStream out = ss.out;
+            long start = System.currentTimeMillis();
 
-          ret = qp.run(cmd);
-          if (ret != 0) {
-            qp.close();
-            return ret;
-          }
-        
-          Vector<String> res = new Vector<String>();
-          try {
-            while (qp.getResults(res)) {
-              for (String r:res) {
-                out.println(r);
-              }
-              res.clear();
-              if (out.checkError()) {
-                break;
-              }
+            ret = qp.run(cmd);
+            if (ret != 0) {
+                qp.close();
+                return ret;
             }
-          } catch (IOException e) {
-            console.printError("Failed with exception " + e.getClass().getName() + ":" +   e.getMessage(),
-                "\n" + org.apache.hadoop.util.StringUtils.stringifyException(e));
-            ret = 1;
-          }
+        
+            Vector<String> res = new Vector<String>();
+            try {
+                while (qp.getResults(res)) {
+                    for (String r:res) {
+                        out.println(r);
+                    }
+                    res.clear();
+                    if (out.checkError()) {
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                console.printError("Failed with exception " + e.getClass().getName() + ":" +   e.getMessage(),
+                                   "\n" + org.apache.hadoop.util.StringUtils.stringifyException(e));
+                ret = 1;
+            }
             
-          int cret = qp.close();
-          if (ret == 0) {
-            ret = cret;
-          }
+            int cret = qp.close();
+            if (ret == 0) {
+                ret = cret;
+            }
 
-          long end = System.currentTimeMillis();
-          if (end > start) {
-            double timeTaken = (double)(end-start)/1000.0;
-            console.printInfo("Time taken: " + timeTaken + " seconds", null);
-          }
+            long end = System.currentTimeMillis();
+            if (end > start) {
+                double timeTaken = (double)(end-start)/1000.0;
+                console.printInfo("Time taken: " + timeTaken + " seconds", null);
+            }
 
         } else {
-          ret = proc.run(cmd_1);
+            ret = proc.run(cmd_1);
         }
-      }
     }
 
     return ret;
-  }
-
-  public int processLine(String line) {
-    int lastRet = 0, ret = 0;
-    
-    String command="";
-    for(String oneCmd: line.split(";")) {
-      
-      if (StringUtils.endsWith(oneCmd, "\\")){
-        command+=StringUtils.chop(oneCmd)+";";
-        continue;
-      } else {
-        command+=oneCmd;
-      }
-      if(StringUtils.isBlank(command))
-        continue;
-     
-      ret = processCmd(command);
-      command="";
-      lastRet = ret;
-      boolean ignoreErrors = HiveConf.getBoolVar(conf, HiveConf.ConfVars.CLIIGNOREERRORS);
-      if(ret != 0 && !ignoreErrors) {
-        return ret;
-      }
-    }
-    return lastRet;
-  }
-
-  public int processReader(BufferedReader r) throws IOException {
-    String line;
-    StringBuffer qsb = new StringBuffer();
-
-    while((line = r.readLine()) != null) {
-      qsb.append(line + "\n");
-    }
-
-    return (processLine(qsb.toString()));
   }
 
   public static void main(String[] args) throws Exception {
@@ -207,8 +118,16 @@ public class QueryRunner {
     // NOTE: It is critical to do this here so that log4j is reinitialized before
     // any of the other core hive classes are loaded
     SessionState.initHiveLog4j();
-
+    
     CliSessionState ss = new CliSessionState (new HiveConf(SessionState.class));
+
+    ss.in = System.in;
+    try {
+      ss.out = new PrintStream(System.out, true, "UTF-8");
+      ss.err = new PrintStream(System.err, true, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      System.exit(3);
+    }
 
     // set all properties specified via command line
     HiveConf conf = ss.getConf();
@@ -228,10 +147,16 @@ public class QueryRunner {
       Thread.currentThread().setContextClassLoader(loader);
     }
 
+    //conf.set("javax.jdo.option.ConnectionURL", "jdbc:mysql://localhost:3333/hive?createDatabaseIfNotExist=true");
+    HiveConf.setVar(conf, HiveConf.ConfVars.METASTOREURIS, "jdbc:mysql://localhost:3333/hive?createDatabaseIfNotExist=true");
+    conf.set("javax.jdo.option.ConnectionUserName", "hive");
+    conf.set("javax.jdo.option.ConnectionPassword", "hive");
+    conf.set("javax.jdo.option.ConnectionDriverName", "com.mysql.jdbc.Driver");
+
     SessionState.start(ss);
 
-    QueryRunner cli = new QueryRunner ();
-    clj.processLine("SHOW TABLES");
+    QueryRunner cli = new QueryRunner();
+    cli.processCmd("show tables");
 
   }
 
