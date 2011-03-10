@@ -1,8 +1,9 @@
-(defproject com.atti.wdm/smoker "1.0.1"
+(defproject com.atti.wdm/smoker "1.0.1-SNAPSHOT"
   :description "When you visit your Hive, bring your smoker and you'll get stung less"
   :dependencies 
   [[org.clojure/clojure "1.2.0"]
    [org.clojure/clojure-contrib "1.2.0"]
+   [url-normalizer "0.0.4"]
    [commons-logging "1.0.4"]]
   :dev-dependencies
   [[org.apache.hadoop/hadoop-core "0.20.2-dev" :exclusions
@@ -26,8 +27,8 @@
    [hive/hive-service "0.5.0"]
    [hive/hive-shims "0.5.0"]
    [hive/hive-serde "0.5.0"]
-   [url-normalizer "0.0.4"]
-   [raven "1.0.1-SNAPSHOT"]
+   [commons-lang/commons-lang "2.5"]
+   [jline "0.9.94"]
    [lein-run "1.0.0"]
    [lein-javac "1.2.1-SNAPSHOT"]
    [swank-clojure "1.3.0-SNAPSHOT"]
