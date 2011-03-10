@@ -6,19 +6,21 @@
    [url-normalizer "0.0.4"]
    [commons-logging "1.0.4"]]
   :dev-dependencies
-  [[org.apache.hadoop/hadoop-core "0.20.2-dev" :exclusions
-    [log4j
-     commons-httpclient
-     javax.servlet/servlet-api
-     org.apache.ant/ant
-     org.apache.ant/ant-launcher
-     org.eclipse.jdt/core
-     org.mortbay.jetty/jetty
-     org.mortbay.jetty/jsp-2.1
-     org.mortbay.jetty/jsp-api-2.1
-     org.mortbay.jetty/servlet-api-2.5
-     org.slf4j/slf4j-api
-     org.slf4j/slf4j-log4j12]]
+  [[org.apache.hadoop/hadoop-core "0.20.2-dev" 
+    ;;:exclusions
+    ;; [log4j
+    ;;  commons-httpclient
+    ;;  javax.servlet/servlet-api
+    ;;  org.apache.ant/ant
+    ;;  org.apache.ant/ant-launcher
+    ;;  org.eclipse.jdt/core
+    ;;  org.mortbay.jetty/jetty
+    ;;  org.mortbay.jetty/jsp-2.1
+    ;;  org.mortbay.jetty/jsp-api-2.1
+    ;;  org.mortbay.jetty/servlet-api-2.5
+    ;;  org.slf4j/slf4j-api
+    ;; org.slf4j/slf4j-log4j12]
+    ]
    [hive/hive-common "0.5.0"]
    [hive/hive-cli "0.5.0"]
    [hive/hive-exec "0.5.0"]
@@ -27,13 +29,28 @@
    [hive/hive-service "0.5.0"]
    [hive/hive-shims "0.5.0"]
    [hive/hive-serde "0.5.0"]
+   [hive/hive-jdbc "0.5.0"]
    [commons-lang/commons-lang "2.5"]
    [jline "0.9.94"]
    [lein-run "1.0.0"]
    [lein-javac "1.2.1-SNAPSHOT"]
    [swank-clojure "1.3.0-SNAPSHOT"]
    [robert/hooke "1.0.2"]
-   [lein-daemon "0.2.1"]]
+   [org.antlr/antlr "3.0.1"]
+   [fb/libfb303 "3.0.3"]
+   [lein-daemon "0.2.1"]
+   [org.datanucleus/datanucleus-core "1.1.2"]
+   ;;[org.datanucleus/datanucleus-enhancer "1.1.2"]
+   [org.datanucleus/datanucleus-rdbms "1.1.2"]
+   [org.datanucleus/datanucleus-connectionpool "1.0.2"]
+   [commons-pool "1.2"]
+   [commons-dbcp "1.2.2"]
+   [commons-collections "3.2.1"]
+   ;;[org.datanucleus/datanucleus-enhancer "1.1.2"]
+   [javax.jdo/jdo2-api "2.3-ea"]
+   [javax.jdo/jdo2-api "2.3-eb"]
+   [mysql/mysql-connector-java "5.0.2"]
+   ]
   :repositories
     {"clojars" "http://clojars.org/repo"
      "yp"      "http://maven.corp.atti.com:9999/nexus/content/groups/public"
@@ -47,3 +64,9 @@
   :source-path "src/clj"
   :aot :all
   )
+
+
+;; tmp
+;; export HADOOP_HOME=~/projects/atti-configs/qbert-hadoop; export HIVE_HOME=~/projects/atti-configs/qbert-hive; export HIVE_CONF_DIR=$HIVE_HOME/conf
+;; lein clean && lein javac && lein jar && java -cp build/smoker-1.0.1-SNAPSHOT.jar:`cat classpath`:$HIVE_CONF_DIR smoker.QueryRunner
+
