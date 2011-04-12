@@ -63,7 +63,6 @@ public class QueryRunner {
 
   public void boot() {
    
-    // todo allow overriding these
     ss.in = System.in;
     try {
       ss.out = new PrintStream(System.out, true, "UTF-8");
@@ -155,6 +154,7 @@ public class QueryRunner {
     return ret;
   }
 
+  // INSERT OVERWRITE DIRECTORY "/user/nmurray/hive-qs/test000" SELECT * FROM web_links limit 10;
   public static void main(String[] args) throws Exception {
     QueryRunner cli = new QueryRunner();
     cli.runCmd("describe web_data");
