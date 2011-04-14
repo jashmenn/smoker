@@ -4,6 +4,8 @@
   [[org.clojure/clojure "1.2.0"]
    [org.clojure/clojure-contrib "1.2.0"]
    [url-normalizer "0.0.4"]
+   [net.htmlparser.jericho/jericho-html "3.1"]
+   [clj-html-parser "0.1.6"]
    [commons-logging "1.0.4"]]
   :dev-dependencies
   [[org.apache.hadoop/hadoop-core "0.20.2-dev"]

@@ -2,13 +2,16 @@
 (ns smoker.utils
   (:require 
    [clojure.contrib.str-utils2 :as su]
-   [clojure.contrib.io :as io]))
+   [clojure.contrib.io :as io])
+  (:import [java.net URI URL]))
 
-(defn as-url
-  "takes urlish and attempts to make it a valid URL"
-  [urlish]
-  (let [nospaces (su/replace (str urlish) #"\s" "%20")
-        url (io/as-url nospaces)]
-    url))
+(defmacro nil-if-exception [& body]
+  `(try (do ~@body) (catch Exception e# nil)))
 
+(defn re-sub-all-but-last [regex replacement string]
+  (let [count (count (doall (re-seq regex string)))]
+    (loop [str string i (- count 1)]
+      (if (<= i 0)
+        str
+        (recur (su/replace-first str regex replacement) (dec i))))))
 
