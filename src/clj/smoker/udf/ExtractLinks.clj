@@ -66,10 +66,6 @@
      (map (fn [[txt href]] [txt (norm/canonicalize-url href)])) ;; normalize
      (distinct)))) ;; uniq
 
-(defn do-extraction [source-url body]
-
-  )
-
 (defn -init [] [[] (atom [])])
 (defn -close [this])
 
@@ -88,25 +84,6 @@
     (ObjectInspectorFactory/getStandardStructObjectInspector 
      fieldNames fieldIOs)))
 
-
-(defmacro dot-apply* [t m a] `(. ~t ~m ~@a))
-
-(defn spread
-  [arglist]
-  (cond
-   (nil? arglist) nil
-   (nil? (next arglist)) (seq (first arglist))
-   :else (cons (first arglist) (spread (next arglist)))))
-
-(defmacro dot-apply
-  "Applies fn f to the argument list formed by prepending args to argseq."
-  {:arglists '([f m args* argseq])}
-  [#^clojure.lang.IFn f m & args]
-    `(. ~f (~m ~(spread args))))
-
-(defn dot-apply [target-expr method args]
-  (dot-apply* target-expr method args))
-
 (defn -process [this record]
   (let [primitives 
         (map
@@ -120,8 +97,10 @@
       (.operate this primitives)))))
 
 (defn -operate [this fields]
-  (map (fn [token] [token]) 
-   (seq (FakesonParser/urlStringsFromWhateverThisCrapIs line))))
+  (let [[source-url body] (seq fields)]
+    (extract-links source-url body)))
+
+(comment "UNTESTED")
 
 (comment
 
