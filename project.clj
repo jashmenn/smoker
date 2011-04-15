@@ -9,9 +9,12 @@
    [commons-logging "1.0.4"]]
   :dev-dependencies
   [[org.apache.hadoop/hadoop-core "0.20.2-dev"]
-   [lein-run "1.0.0"]
-   [lein-javac "1.2.1-SNAPSHOT"]
+   [lein-run "1.0.0"
+     :exclusions [org.clojure/clojure-contrib]]
+   [lein-javac "1.2.1-SNAPSHOT"
+      :exclusions [org.clojure/clojure-contrib]]
    [swank-clojure "1.3.0-SNAPSHOT"]
+
    [robert/hooke "1.0.2"]
    [lein-daemon "0.2.1"]
 
