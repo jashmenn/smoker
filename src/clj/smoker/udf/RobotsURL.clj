@@ -7,7 +7,7 @@
   (:require 
    [clojure.contrib.str-utils2 :as su]
    [clojure.contrib.logging :as log]
-   [smoker.utils :as ru]
+   [smoker.url-utils :as ru]
    [url-normalizer.core :as norm])
   (:gen-class
    :name smoker.udf.RobotsURL

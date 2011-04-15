@@ -6,7 +6,7 @@
    [org.apache.hadoop.io Text])
   (:require 
    [clojure.contrib.str-utils2 :as su]
-   [smoker.utils :as ru]
+   [smoker.url-utils :as ru]
    [url-normalizer.core :as norm])
   (:gen-class
    :name smoker.udf.NormalizeURL
