@@ -43,11 +43,15 @@
 (defn both? [[a b]] (and a b))
 
 (defn truncate [s c]
-  (if (> (.length s) c)
-    (.substring s 0 c)
+  (if s
+    (if (> (.length s) c)
+     (.substring s 0 c)
+     s)
     s))
 
 (def max-len 500)
+
+(defn nie [arg] (nil-if-exception arg))
 
 (defn extract-links [in-url body]
   (let [source (Source. body)
@@ -55,15 +59,15 @@
     (->> 
      (reduce                                          ;; extract hrefs
       (fn [acc element] 
-        (let [href (truncate (.getAttributeValue element "href") max-len)
-              txt  (truncate (.toString (.getContent element)) max-len)]
+        (let [href (nie (truncate (.getAttributeValue element "href") max-len))
+              txt  (nie (truncate (.toString (.getContent element)) max-len))]
           (cons [txt href] acc))) [] atags)
      (filter both?)                                ;; remove nils
      (filter (fn [[txt href]] (re-find #"^[^#]" href))) ;; ignore anchors
      (map (fn [[txt href]] 
-            [txt (nil-if-exception (url-utils/href-to-url href in-url))]))
+            [txt (nie (url-utils/href-to-url href in-url))]))
      (filter both?)                                ;; remove nils ?
-     (map (fn [[txt href]] [txt (norm/canonicalize-url href)])) ;; normalize
+     (map (fn [[txt href]] [txt (nie (norm/canonicalize-url href))])) ;; normalize
      (distinct)))) ;; uniq
 
 (defn -init [] [[] (atom [])])
@@ -98,7 +102,8 @@
 
 (defn -operate [this fields]
   (let [[source-url body] (seq fields)]
-    (extract-links source-url body)))
+    (if (and source-url body)
+      (extract-links source-url body))))
 
 (comment "UNTESTED")
 
