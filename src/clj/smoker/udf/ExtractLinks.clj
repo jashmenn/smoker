@@ -51,7 +51,6 @@
 
 (def max-len 500)
 
-(defn nie [arg] (nil-if-exception arg))
 
 (defn extract-links [in-url body]
   (let [source (Source. body)
@@ -59,15 +58,15 @@
     (->> 
      (reduce                                          ;; extract hrefs
       (fn [acc element] 
-        (let [href (nie (truncate (.getAttributeValue element "href") max-len))
-              txt  (nie (truncate (.toString (.getContent element)) max-len))]
+        (let [href (nil-if-exception (truncate (.getAttributeValue element "href") max-len))
+              txt  (nil-if-exception (truncate (.toString (.getContent element)) max-len))]
           (cons [txt href] acc))) [] atags)
      (filter both?)                                ;; remove nils
      (filter (fn [[txt href]] (re-find #"^[^#]" href))) ;; ignore anchors
      (map (fn [[txt href]] 
-            [txt (nie (url-utils/href-to-url href in-url))]))
+            [txt (nil-if-exception (url-utils/href-to-url href in-url))]))
      (filter both?)                                ;; remove nils ?
-     (map (fn [[txt href]] [txt (nie (norm/canonicalize-url href))])) ;; normalize
+     (map (fn [[txt href]] [txt (nil-if-exception (norm/canonicalize-url href))])) ;; normalize
      (distinct)))) ;; uniq
 
 (defn -init [] [[] (atom [])])
