@@ -55,10 +55,19 @@ Note: this is needed becauyse the default URI .resolve is unintuitive see:
                (preprocess-href href))))
 
 (defn href-to-url [href url]
-  (let [href (su/trim href)
-        uri #^URI (resolve-href url href)]
-    (if (.getHost uri)
-      (norm/canonicalize-url uri)
-      nil)))
+  (try
+    (let [href (su/trim href)
+          uri #^URI (resolve-href url href)]
+      (if (.getHost uri)
+        (norm/canonicalize-url uri)
+        nil))
+    (catch java.lang.IllegalArgumentException e
+      (do
+        ;;(log/info (str "Exception parsing href: " href " for uri: " url))
+        nil))
+    (catch java.net.URISyntaxException e
+      (do
+        ;;(log/info (str "Exception parsing href: " href " for uri: " url))
+        nil))))
 
 
