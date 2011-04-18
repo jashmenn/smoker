@@ -20,7 +20,7 @@
   (try 
     (if s
       (let [url (norm/canonicalize-url (ru/as-url (.toString s)))]
-       (Text. (str (.getHost url))))
+       (Text. (str (.getHost (ru/as-url url)))))
       s)
     (catch java.net.URISyntaxException e (do (log/warn e) nil))
     (catch java.net.MalformedURLException e (do (log/warn e) nil))))
