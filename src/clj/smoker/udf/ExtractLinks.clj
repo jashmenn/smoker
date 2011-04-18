@@ -102,7 +102,10 @@
 (defn -operate [this fields]
   (let [[source-url body] (seq fields)]
     (if (and source-url body)
-      (extract-links source-url body))))
+      (try 
+        (extract-links source-url body)
+        (catch java.lang.RuntimeException e (prn "bad html" source-url))
+        (catch java.lang.StackOverflowError e (prn "bad html" source-url))))))
 
 (comment "UNTESTED")
 
