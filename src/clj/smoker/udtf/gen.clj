@@ -1,19 +1,23 @@
 
 (ns smoker.udtf.gen
-  (:import [smoker.udf ClojureUDTF])
-  (:import [java.util ArrayList List])
-  (:import [org.apache.hadoop.hive.ql.exec UDFArgumentException])
-  (:import [org.apache.hadoop.hive.ql.metadata HiveException])
-  (:import [org.apache.hadoop.hive.ql.udf.generic GenericUDTF])
-  (:import [org.apache.hadoop.hive.serde2.objectinspector
+  (:import 
+   [smoker.udf ClojureUDTF]
+   [java.util ArrayList List]
+   [org.apache.hadoop.hive.ql.exec UDFArgumentException]
+   [org.apache.hadoop.hive.ql.metadata HiveException]
+   [org.apache.hadoop.hive.ql.udf.generic GenericUDTF]
+   [org.apache.hadoop.hive.serde2.objectinspector
             ObjectInspector ObjectInspectorFactory PrimitiveObjectInspector
-            StructObjectInspector])
-  (:import [org.apache.hadoop.hive.serde2.objectinspector.primitive 
-            PrimitiveObjectInspectorFactory])
-  (:import [org.apache.hadoop.hive.ql.exec UDF])
-  (:import [org.apache.hadoop.io Text])
-  (:import [java.util Date])
-  (:require [clojure.contrib.str-utils2 :as su]))
+            StructObjectInspector]
+   [org.apache.hadoop.hive.serde2.objectinspector.primitive 
+              PrimitiveObjectInspectorFactory]
+   [org.apache.hadoop.hive.ql.exec UDF]
+   [org.apache.hadoop.io Text]
+   [java.util Date])
+  (:require 
+   [clojure.contrib.str-utils2 :as su]
+   [clojure.contrib.seq-utils :as sequ]))
+
 
 (defmacro gen-udtf
   "Creates a UDTF that takes exactly one argument and can return 0 or more tuples.
@@ -31,14 +35,15 @@ You also need to call gen-wrapper-methods."
         ))))
 
 (defn -init []
-  [[] (ref {:stringIO nil})])
+  [[] (atom [])])
 
 (defn build-initialize [emits]
   (fn [this args]
-    (if (not (= (count args) 1))
+    (if (not (= (count args) (count emits)))
       (throw 
-       (UDFArgumentException. (str *ns* " takes exactly one argument"))))
-    (dosync (alter (.state this) assoc :stringIO (nth args 0)))
+       (UDFArgumentException. 
+        (str *ns* " takes exactly " (count emits) " arguments"))))
+    (swap! (.state this) (fn [_] args))
     (let [fieldNames (ArrayList. (map str (range 0 (count emits))))
           fieldIOs (ArrayList. emits)]
       (ObjectInspectorFactory/getStandardStructObjectInspector 
@@ -47,11 +52,17 @@ You also need to call gen-wrapper-methods."
 (defn -close [this])
 
 (defn -process [this record]
-  (if-let [document (.getPrimitiveJavaObject 
-                     (@(.state this) :stringIO) (nth record 0))]
-    (doall (map (fn [results] 
-                  (.emit this (into-array Object results))) 
-                (.operate this document)))))
+  (let [primitives 
+        (map 
+         (fn [[i thingy]]
+           (.getPrimitiveJavaObject thingy (nth record i)))
+         (sequ/indexed @(.state this)))]
+    (doall 
+     (map 
+      (fn [results] 
+        (.emit this (into-array Object results))) 
+      (.operate this primitives)))))
+
 
 (defn gen-wrapper-methods
   "Generates the methods needed to use your UDTF. 

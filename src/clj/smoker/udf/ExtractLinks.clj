@@ -6,6 +6,7 @@
   (:use 
    [smoker.utils])
   (:require 
+   [smoker.udtf.gen :as gen]
    [smoker.url-utils :as url-utils]
    [url-normalizer.core :as norm]
    [clojure.contrib.str-utils2 :as su]
@@ -31,26 +32,19 @@
    [java.util Date]
    ))
 
-(gen-class
-   :name "smoker.udf.ExtractLinks"
-   :extends smoker.udf.ClojureUDTF
-   :init "init"
-   :constructors {[] []}
-   :methods [["operate" [Object] clojure.lang.ISeq]]
-   :state "state"
-   )
+(gen/gen-udtf)
+(gen/gen-wrapper-methods 
+  [PrimitiveObjectInspectorFactory/javaStringObjectInspector
+   PrimitiveObjectInspectorFactory/javaStringObjectInspector])
 
-(defn both? [[a b]] (and a b))
+(defn- both? [[a b]] (and a b))
 
 (defn truncate [s c]
-  (if s
-    (if (> (.length s) c)
-     (.substring s 0 c)
-     s)
+  (if (and s (> (.length s) c))
+    (.substring s 0 c)
     s))
 
 (def max-len 500)
-
 
 (defn extract-links [in-url body]
   (let [source (Source. body)
@@ -69,36 +63,6 @@
      (map (fn [[txt href]] [txt (nil-if-exception (norm/canonicalize-url href))])) ;; normalize
      (distinct)))) ;; uniq
 
-(defn -init [] [[] (atom [])])
-(defn -close [this])
-
-(def emits
-  [PrimitiveObjectInspectorFactory/javaStringObjectInspector
-   PrimitiveObjectInspectorFactory/javaStringObjectInspector])
-
-(defn -initialize [this args]
-  (if (not (= (count args) (count emits)))
-    (throw 
-     (UDFArgumentException. 
-      (str *ns* " takes exactly " (count emits) " arguments"))))
-  (swap! (.state this) (fn [_] args))
-  (let [fieldNames (ArrayList. (map str (range 0 (count emits))))
-        fieldIOs (ArrayList. emits)]
-    (ObjectInspectorFactory/getStandardStructObjectInspector 
-     fieldNames fieldIOs)))
-
-(defn -process [this record]
-  (let [primitives 
-        (map
-         (fn [[i thingy]]
-           (.getPrimitiveJavaObject thingy (nth record i)))
-         (sequ/indexed @(.state this)))]
-    (doall 
-     (map 
-      (fn [results] 
-        (.emit this (into-array Object results))) 
-      (.operate this primitives)))))
-
 (defn -operate [this fields]
   (let [[source-url body] (seq fields)]
     (if (and source-url body)
@@ -106,8 +70,6 @@
         (extract-links source-url body)
         (catch java.lang.RuntimeException e (prn "bad html" source-url))
         (catch java.lang.StackOverflowError e (prn "bad html" source-url))))))
-
-(comment "UNTESTED")
 
 (comment
 
