@@ -1,4 +1,17 @@
 
+;; create temporary function links as "smoker.udf.ExtractLinks";
+;;
+;; SELECT atext, href 
+;; FROM ( 
+;;   SELECT links(url, body) AS (atext, href)
+;;   FROM web_data
+;;   WHERE ds=20110415
+;; ) a
+;; WHERE 
+;;   a.atext like "%menu%" 
+;;   AND NOT (a.atext LIKE '%<%')
+;;   AND NOT (a.atext LIKE '%javascript%');
+
 (ns smoker.udf.ExtractLinks
   (:import 
    [org.apache.hadoop.hive.serde2.objectinspector.primitive 
@@ -17,20 +30,8 @@
     Source StartTag]
    [java.util.regex Pattern])
   (:import 
-   [smoker.udf ClojureUDTF]
-   [java.util ArrayList List]
-   [org.apache.hadoop.hive.ql.exec UDFArgumentException]
-   [org.apache.hadoop.hive.ql.metadata HiveException]
-   [org.apache.hadoop.hive.ql.udf.generic GenericUDTF]
-   [org.apache.hadoop.hive.serde2.objectinspector
-    ObjectInspector ObjectInspectorFactory PrimitiveObjectInspector
-    StructObjectInspector]
-   [org.apache.hadoop.hive.serde2.objectinspector.primitive 
-    PrimitiveObjectInspectorFactory]
-   [org.apache.hadoop.hive.ql.exec UDF]
    [org.apache.hadoop.io Text]
-   [java.util Date]
-   ))
+   [java.util Date]))
 
 (gen/gen-udtf)
 (gen/gen-wrapper-methods 
@@ -38,11 +39,6 @@
    PrimitiveObjectInspectorFactory/javaStringObjectInspector])
 
 (defn- both? [[a b]] (and a b))
-
-(defn truncate [s c]
-  (if (and s (> (.length s) c))
-    (.substring s 0 c)
-    s))
 
 (def max-len 500)
 

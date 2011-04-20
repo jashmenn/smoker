@@ -15,3 +15,8 @@
         str
         (recur (su/replace-first str regex replacement) (dec i))))))
 
+(defn truncate [s c]
+  (if (and s (> (.length s) c))
+    (.substring s 0 c)
+    s))
+
