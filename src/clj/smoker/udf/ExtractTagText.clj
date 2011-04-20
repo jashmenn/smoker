@@ -39,7 +39,7 @@
 (defn extract-tags-text [tags body]
   (let [source (Source. body)]
     (reduce 
-     (fn [tag] (concat (extract-tag-text tag source)))
+     (fn [acc tag] (concat acc (extract-tag-text tag source)))
      []
      (su/split tags #"\|"))))
 
