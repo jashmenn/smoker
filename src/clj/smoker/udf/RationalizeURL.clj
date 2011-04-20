@@ -20,8 +20,8 @@
   [source href]
   (try 
     (if (and source href)
-      (Text. (ru/href-to-url (.toString href) (.toString source)))
-      "")
+      (if-let [new-url (ru/href-to-url (.toString href) (.toString source))]
+       (Text. new-url)))
     (catch java.net.URISyntaxException e (do (prn e) nil))
     (catch java.net.MalformedURLException e (do (prn e) nil))))
 
