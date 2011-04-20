@@ -56,5 +56,22 @@
   (def html-doc (slurp "test-resources/toy-pages/fake1.html"))
   (extract-tags-text "h1|h2" html-doc)
 
+
+  (import [java.util.regex Pattern Matcher])
+
+  (let [p (Pattern/compile "(?i).*\b(us|our|me)\b.*")
+        m (.matcher p "follow US on twitter!")]
+    (.find m 0))
+
+    ;; }
+    ;; if (!regex.equals(lastRegex) || p == null) {
+    ;;   lastRegex.set(regex);
+    ;;   p = Pattern.compile(regex.toString());
+    ;; }
+    ;; Matcher m = p.matcher(s.toString());
+    ;; result.set(m.find(0));
+    ;; return result;
+ 
+
   )
 
