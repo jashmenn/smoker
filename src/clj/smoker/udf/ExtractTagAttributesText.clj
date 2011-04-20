@@ -7,6 +7,7 @@
    [smoker.utils])
   (:require 
    [smoker.udtf.gen :as gen]
+   [clojure.contrib.string :as string]
    [smoker.url-utils :as url-utils]
    [url-normalizer.core :as norm]
    [clojure.contrib.str-utils2 :as su]
@@ -24,31 +25,46 @@
 (gen/gen-wrapper-methods 
   [PrimitiveObjectInspectorFactory/javaStringObjectInspector
    PrimitiveObjectInspectorFactory/javaStringObjectInspector
-   PrimitiveObjectInspectorFactory/javaStringObjectInspector])
+   PrimitiveObjectInspectorFactory/javaStringObjectInspector
+   PrimitiveObjectInspectorFactory/javaIntObjectInspector
+   ])
 
 (def max-len 500)
 
-(defn extract-attribute-text [element]
+(defn extract-attribute-text [attributes]
   (su/join " "
    (map #(.getValue %)
-    (iterator-seq (.iterator (.getAttributes element))))))
+    (iterator-seq (.iterator attributes)))))
 
-(defn extract-tag-attribute-text [tag wanted source]
-  (let [tags (.getAllElements source tag)]
-    (->> tags
-         (map 
-          (fn [element] 
-            [tag 
-             (nil-if-exception 
-              (truncate (if (not (empty? wanted))
-                          (.getAttributeValue element wanted) "") max-len))
-             (nil-if-exception
-              (truncate (extract-attribute-text element) max-len))])))))
+(defn extract-tag-attribute-text-streaming [tag wanted body]
+  (->> (map (fn [element i] [element i]) 
+            (iterator-seq (.iterator (StreamedSource. body)))
+            (iterate inc 0))
+       (filter (fn [[seg i]]
+                 (if (and (= (type seg) StartTag)
+                          (= (string/lower-case tag) 
+                             (string/lower-case (.getName seg))))
+                   true)))
+       (map 
+          (fn [[seg i]] 
+            (let [attributes (.parseAttributes seg)] 
+              [tag 
+              (if (not (empty? wanted)) ;; attribute-wanted
+                (nil-if-exception
+                  (truncate 
+                    (.getValue attributes wanted) max-len))
+                "")
+              (nil-if-exception ;; attribute text 
+               (truncate 
+                (extract-attribute-text attributes) max-len))
+               i])))))
 
 (defn extract-tags-attribute-text [tags wanted body]
   (let [source (Source. body)]
     (reduce 
-     (fn [acc tag] (concat acc (extract-tag-attribute-text tag wanted source)))
+     (fn [acc tag] 
+       (concat acc 
+               (extract-tag-attribute-text-streaming tag wanted body)))
      []
      (su/split tags #"\|"))))
 
