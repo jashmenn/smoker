@@ -25,9 +25,7 @@
 (gen/gen-wrapper-methods 
   [PrimitiveObjectInspectorFactory/javaStringObjectInspector
    PrimitiveObjectInspectorFactory/javaStringObjectInspector
-   PrimitiveObjectInspectorFactory/javaStringObjectInspector
-   PrimitiveObjectInspectorFactory/javaIntObjectInspector
-   ])
+   PrimitiveObjectInspectorFactory/javaStringObjectInspector])
 
 (def max-len 500)
 
