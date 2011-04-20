@@ -1,5 +1,5 @@
 
-(ns smoker.udf.ExtractTagText
+(ns smoker.udf.ExtractTagAttributesText
   (:import 
    [org.apache.hadoop.hive.serde2.objectinspector.primitive 
     PrimitiveObjectInspectorFactory])
@@ -23,55 +23,54 @@
 (gen/gen-udtf)
 (gen/gen-wrapper-methods 
   [PrimitiveObjectInspectorFactory/javaStringObjectInspector
+   PrimitiveObjectInspectorFactory/javaStringObjectInspector
    PrimitiveObjectInspectorFactory/javaStringObjectInspector])
 
 (def max-len 500)
-(defn- both? [[a b]] (and a b))
 
-(defn extract-tag-text [tag source]
+(defn extract-attribute-text [element]
+  (su/join " "
+   (map #(.getValue %)
+    (iterator-seq (.iterator (.getAttributes element))))))
+
+(defn extract-tag-attribute-text [tag wanted source]
   (let [tags (.getAllElements source tag)]
     (->> tags
          (map 
           (fn [element] 
-            [tag (nil-if-exception (truncate (.toString (.getContent element)) max-len))]))
-         (filter both?))))
+            [tag 
+             (nil-if-exception 
+              (truncate (if (not (empty? wanted))
+                          (.getAttributeValue element wanted) "") max-len))
+             (nil-if-exception
+              (truncate (extract-attribute-text element) max-len))])))))
 
-(defn extract-tags-text [tags body]
+(defn extract-tags-attribute-text [tags wanted body]
   (let [source (Source. body)]
     (reduce 
-     (fn [acc tag] (concat acc (extract-tag-text tag source)))
+     (fn [acc tag] (concat acc (extract-tag-attribute-text tag wanted source)))
      []
      (su/split tags #"\|"))))
 
 (defn -operate [this fields]
-  (let [[tag body] (seq fields)]
-    (if (and tag body)
+  (let [[tag wanted body] (seq fields)]
+    (if (and tag wanted body)
       (try 
-        (extract-tags-text tag body)
+        (extract-tags-attribute-text tag wanted body)
         (catch java.lang.RuntimeException e (prn "bad html"))
         (catch java.lang.StackOverflowError e (prn "bad html"))))))
 
 (comment
 
   (def html-doc (slurp "test-resources/toy-pages/fake1.html"))
-  (extract-tags-text "h1|h2" html-doc)
-
+  (extract-tags-attribute-text "h1|h2" "" html-doc)
+  (extract-tags-attribute-text "img" "src" html-doc)
 
   (import [java.util.regex Pattern Matcher])
 
   (let [p (Pattern/compile "(?i).*\\b(us|our|me)\\b.*")
         m (.matcher p "follow US on twitter!")]
     (.find m 0))
-
-    ;; }
-    ;; if (!regex.equals(lastRegex) || p == null) {
-    ;;   lastRegex.set(regex);
-    ;;   p = Pattern.compile(regex.toString());
-    ;; }
-    ;; Matcher m = p.matcher(s.toString());
-    ;; result.set(m.find(0));
-    ;; return result;
- 
 
   )
 
