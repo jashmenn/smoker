@@ -39,10 +39,10 @@ You also need to call gen-wrapper-methods."
 
 (defn build-initialize [emits]
   (fn [this args]
-    (if (not (= (count args) (count emits)))
-      (throw 
-       (UDFArgumentException. 
-        (str *ns* " takes exactly " (count emits) " arguments"))))
+    ;; (if (not (= (count args) (count emits)))
+    ;;   (throw 
+    ;;    (UDFArgumentException. 
+    ;;    (str *ns* " takes exactly " (count emits) " arguments"))))
     (swap! (.state this) (fn [_] args))
     (let [fieldNames (ArrayList. (map str (range 0 (count emits))))
           fieldIOs (ArrayList. emits)]
