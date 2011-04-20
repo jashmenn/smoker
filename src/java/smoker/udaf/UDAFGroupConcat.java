@@ -32,7 +32,7 @@ public class UDAFGroupConcat extends UDAF{
           mOutput = new Text(o);
           mEmpty = false;
         } else {
-          mOutput.set(mOutput.toString() + "\u002" + o.toString());
+          mOutput.set(mOutput.toString() + "\u0002" + o.toString());
         }
       }
       return true;
