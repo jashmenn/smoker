@@ -23,31 +23,34 @@
 (gen/gen-udtf)
 (gen/gen-wrapper-methods 
   [PrimitiveObjectInspectorFactory/javaStringObjectInspector
+   PrimitiveObjectInspectorFactory/javaStringObjectInspector
    PrimitiveObjectInspectorFactory/javaStringObjectInspector])
 
 (def max-len 500)
-(defn- both? [[a b]] (and a b))
+(defn- both? [[a b c]] (and a b c))
 
-(defn extract-tag-text [tag source]
+(defn extract-tag-text [source-url tag source]
   (let [tags (.getAllElements source tag)]
     (->> tags
          (map 
           (fn [element] 
-            [tag (nil-if-exception (truncate (.toString (.getContent element)) max-len))]))
+            [source-url
+             tag 
+             (nil-if-exception (truncate (.toString (.getContent element)) max-len))]))
          (filter both?))))
 
-(defn extract-tags-text [tags body]
+(defn extract-tags-text [source-url tags body]
   (let [source (Source. body)]
     (reduce 
-     (fn [acc tag] (concat acc (extract-tag-text tag source)))
+     (fn [acc tag] (concat acc (extract-tag-text source-url tag source)))
      []
      (su/split tags #"\|"))))
 
 (defn -operate [this fields]
-  (let [[tag body] (seq fields)]
-    (if (and tag body)
+  (let [[source-url tag body] (seq fields)]
+    (if (and source-url tag body)
       (try 
-        (extract-tags-text tag body)
+        (extract-tags-text source-url tag body)
         (catch java.lang.RuntimeException e (prn "bad html"))
         (catch java.lang.StackOverflowError e (prn "bad html"))))))
 
