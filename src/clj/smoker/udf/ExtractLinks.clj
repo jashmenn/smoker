@@ -36,6 +36,7 @@
 (gen/gen-udtf)
 (gen/gen-wrapper-methods 
   [PrimitiveObjectInspectorFactory/javaStringObjectInspector
+   PrimitiveObjectInspectorFactory/javaStringObjectInspector
    PrimitiveObjectInspectorFactory/javaStringObjectInspector])
 
 (defn- both? [[a b]] (and a b))
@@ -56,8 +57,8 @@
      (map (fn [[txt href]] 
             [txt (nil-if-exception (url-utils/href-to-url href in-url))]))
      (filter both?)                                ;; remove nils ?
-     (map (fn [[txt href]] [txt (nil-if-exception (norm/canonicalize-url href))])) ;; normalize
-     (distinct)))) ;; uniq
+     (map (fn [[txt href]] [in-url txt (nil-if-exception (norm/canonicalize-url href))])) ;; normalize
+     )))
 
 (defn -operate [this fields]
   (let [[source-url body] (seq fields)]
