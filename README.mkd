@@ -1,6 +1,6 @@
 # smoker
 
-![SMOKER](/nmurray/smoker/raw/master/doc/images/smoker.jpg)
+![SMOKER](/jashmenn/smoker/raw/master/doc/images/smoker.jpg)
 
 Custom Hive UDFs in Clojure
 
