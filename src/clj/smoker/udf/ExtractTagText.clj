@@ -66,6 +66,16 @@
         m (.matcher p "follow US on twitter!")]
     (.find m 0))
 
+  (let [p (Pattern/compile "(?i).*est(?:ablished)?[\\.:]?\\s*(\\d\\d\\d\\d).*")
+        x (Pattern/compile "(?i).*est(?:ablished)?[\\.:]?\\s*(\\d\\d\\d\\d).*")
+        m (.matcher x "we were est. 1987")
+        found (.find m)
+        mr (.toMatchResult m)]
+    ;;(prn (.find m 0))
+    (when found
+      (.group mr 1)))
+
+
     ;; }
     ;; if (!regex.equals(lastRegex) || p == null) {
     ;;   lastRegex.set(regex);
