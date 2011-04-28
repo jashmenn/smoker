@@ -49,9 +49,3 @@
   :source-path "src/clj"
   :aot :all
   )
-
-
-;; tmp
-;; export HADOOP_HOME=~/projects/atti-configs/qbert-hadoop; export HIVE_HOME=~/projects/atti-configs/qbert-hive; export HIVE_CONF_DIR=$HIVE_HOME/conf
-;; lein clean && lein javac && lein jar && java -cp build/smoker-1.0.1-SNAPSHOT.jar:`cat classpath`:$HIVE_CONF_DIR smoker.QueryRunner
-
